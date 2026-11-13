@@ -1,6 +1,6 @@
 {
   "name": "magpie-agent-wave",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Wave Terminal as a magpie agent: pick a model on magpie's Agents page and it becomes a Wave AI mode on magpie's local gateway",
   "license": "MIT",
   "keywords": ["magpie", "magpie-plugin", "opencode", "opencode-plugin", "agent", "wave", "waveterm", "wave-terminal"],
