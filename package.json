@@ -9,6 +9,6 @@
   "files": ["wave.agent.js", "README.md", "LICENSE"],
   "magpie": {
     "agent": "./wave.agent.js",
-    "icon": "https://docs.waveterm.dev/img/logo/wave-light.png"
+    "icon": "https://github.com/wavetermdev.png"
   }
 }

@@ -1,19 +1,22 @@
-// Wave Terminal (waveterm.dev) reads its AI modes from
-// ~/.config/waveterm/waveai.json: each top-level key is a mode whose
-// ai:endpoint is a full chat-completions URL (localhost is fine), so a
-// "magpie" mode pointing at magpie's gateway works with no cloud
-// involved. magpie writes the picked model into the mode's ai:model,
-// and connect keeps the rest of the mode in place.
+// Wave Terminal (waveterm) keeps its AI modes in ~/.config/waveterm/waveai.json.
+// We give Wave one fixed mode, "magpie", managed as a whole object: connect
+// returns the full mode — display:name included, which Wave's schema requires
+// — and magpie writes it as one key, so switching off removes "magpie"
+// entirely and leaves the user's own modes as they were. The model magpie
+// picks is written separately as magpie.ai:model.
 export const agent = {
   id: "wave",
   name: "Wave",
-  // waveterm.dev's own mark, on the Agents page and the plugin's row
-  icon: "https://docs.waveterm.dev/img/logo/wave-light.png",
+  icon: "https://github.com/wavetermdev.png",
+  // detection: the wsh CLI, or Wave's config directory
   bin: "wsh",
-  dir: "~/.waveterm",
+  dir: "~/.config/waveterm",
   config: "~/.config/waveterm/waveai.json",
   format: "json",
+  // the model magpie picks, inside the mode object (Wave's ai:model)
   model: "magpie.ai:model",
+  // Wave passes ai:model as-is to the gateway, so no prefix
+  prefix: "",
   ua: ["waveterm", "wave"],
   notice:
     "Wave reads waveai.json live; pick the Magpie mode in Wave AI's mode dropdown once, or run `wsh setconfig waveai:defaultmode=magpie`. Wave 实时读取 waveai.json；在 Wave AI 面板的模式下拉里选一次 Magpie，或执行 `wsh setconfig waveai:defaultmode=magpie`。",
@@ -30,23 +33,23 @@ function thinkingLevel(model) {
 }
 
 export function connect({ gateway, model }) {
+  const caps = model?.images ? ["tools", "images"] : ["tools"]
   const name = model?.name || model?.id
-  const capabilities = ["tools"]
-  if (model?.images) capabilities.push("images")
   const mode = {
-    "magpie.display:name": name ? `Magpie · ${name}` : "Magpie",
-    "magpie.display:order": 1,
+    "display:name": name ? `Magpie · ${name}` : "Magpie",
+    "display:order": 1,
     // FontAwesome's bird, the closest it has to a magpie
-    "magpie.display:icon": "crow",
-    "magpie.ai:provider": "custom",
-    "magpie.ai:apitype": "openai-chat",
-    // Wave wants the full endpoint path, not a base URL
-    "magpie.ai:endpoint": `${gateway.v1}/chat/completions`,
-    // magpie's key for Wave, so Usage names its requests
-    "magpie.ai:apitoken": gateway.key,
-    "magpie.ai:capabilities": capabilities,
+    "display:icon": "crow",
+    "ai:model": model?.id ?? "",
+    "ai:endpoint": gateway.v1 + "/chat/completions",
+    "ai:apitype": "openai-chat",
+    "ai:apitoken": gateway.key,
+    "ai:capabilities": caps,
   }
   const thinking = thinkingLevel(model)
-  if (thinking) mode["magpie.ai:thinkinglevel"] = thinking
-  return mode
+  if (thinking) mode["ai:thinkinglevel"] = thinking
+  return {
+    // one whole object, so a disconnect takes the mode out with it
+    magpie: mode,
+  }
 }

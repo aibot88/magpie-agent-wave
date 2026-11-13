@@ -13,11 +13,11 @@ Then pick one of magpie's models in Wave's row. magpie writes a `magpie` mode in
 {
   "magpie": {
     "display:name": "Magpie · Kimi K3",
+    "display:order": 1,
     "display:icon": "crow",
-    "ai:provider": "custom",
-    "ai:apitype": "openai-chat",
     "ai:model": "<magpie's model, e.g. tokenservice/kimi-k3>",
     "ai:endpoint": "http://127.0.0.1:3425/v1/chat/completions",
+    "ai:apitype": "openai-chat",
     "ai:apitoken": "<Wave's own key, so Usage names it>",
     "ai:capabilities": ["tools"]
   }
